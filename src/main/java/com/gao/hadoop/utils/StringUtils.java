@@ -1,4 +1,4 @@
-package com.cmbc.hadoop.utils;
+package com.gao.hadoop.utils;
 
 import java.util.Arrays;
 import java.util.HashMap;

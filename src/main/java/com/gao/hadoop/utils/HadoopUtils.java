@@ -1,4 +1,4 @@
-package com.cmbc.hadoop.utils;
+package com.gao.hadoop.utils;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;

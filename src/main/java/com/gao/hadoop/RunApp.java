@@ -1,8 +1,8 @@
-package com.cmbc.hadoop;
+package com.gao.hadoop;
 
-import com.cmbc.hadoop.utils.HadoopUtils;
-import com.cmbc.hadoop.utils.KerberosUtils;
-import com.cmbc.hadoop.utils.StringUtils;
+import com.gao.hadoop.utils.HadoopUtils;
+import com.gao.hadoop.utils.KerberosUtils;
+import com.gao.hadoop.utils.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
