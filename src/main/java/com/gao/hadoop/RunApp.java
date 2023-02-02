@@ -1,5 +1,6 @@
 package com.gao.hadoop;
 
+import com.gao.hadoop.utils.FileUtils;
 import com.gao.hadoop.utils.HadoopUtils;
 import com.gao.hadoop.utils.KerberosUtils;
 import com.gao.hadoop.utils.StringUtils;
@@ -20,25 +21,33 @@ public class RunApp {
     public void runApp(Map<String, String> map) {
         String krb5Path = map.get("krb5Path");
         String keytabPath = map.get("keytabPath");
+        String principal = map.get("principal");
+        String hadoopConfDir = System.getenv().get("HADOOP_CONF_DIR");
 
-        if (StringUtils.isNotEmpty(krb5Path) && StringUtils.isNotEmpty(keytabPath)) {
-            String principal = map.get("principal");
-            if (StringUtils.isEmpty(principal)) {
-                logger.error("The principal is be empty.");
-                System.exit(-1);
-            }
-            Configuration config = new Configuration();
-            KerberosUtils.tryKerberosLogin(config, keytabPath, krb5Path, principal);
-
-            HadoopUtils instance = HadoopUtils.getInstance();
-            instance.createFileSystem(config);
-
-            Path[] paths = instance.listFiles("");
-            System.out.println(Arrays.toString(paths));
-        } else {
-            logger.error("The krb5.conf path [{}] or keytab path [{}] is be empty.", krb5Path, keytabPath);
+        if (StringUtils.isEmpty(krb5Path) || !FileUtils.checkFileIsExist(krb5Path)) {
+            logger.error("The krb5.conf path [{}] is not exist.", krb5Path);
             System.exit(-1);
         }
+        if (StringUtils.isEmpty(keytabPath) || !FileUtils.checkFileIsExist(keytabPath)) {
+            logger.error("The keytab path [{}] is not exist.", keytabPath);
+            System.exit(-1);
+        }
+        if (StringUtils.isEmpty(principal)) {
+            logger.error("The principal is be empty.");
+            System.exit(-1);
+        }
+        if (StringUtils.isEmpty(hadoopConfDir) || !FileUtils.checkDirectoryIsExist(hadoopConfDir)){
+            logger.error("The HADOOP_CONF_DIR is be empty.");
+            System.exit(-1);
+        }
+        Configuration config = new Configuration();
+        KerberosUtils.tryKerberosLogin(config, keytabPath, krb5Path, principal);
+        HadoopUtils instance = HadoopUtils.getInstance();
+        instance.createFileSystem(config);
+
+
+        Path[] paths = instance.listFiles("");
+        System.out.println(Arrays.toString(paths));
     }
 
     public static void main(String[] args) {
