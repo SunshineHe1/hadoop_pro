@@ -1,15 +1,18 @@
 package com.gao.hadoop;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.gao.hadoop.artifact.ArtifactTransport;
+import com.gao.hadoop.enums.TransportType;
 import com.gao.hadoop.utils.FileUtils;
 import com.gao.hadoop.utils.HadoopUtils;
 import com.gao.hadoop.utils.KerberosUtils;
 import com.gao.hadoop.utils.StringUtils;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -17,37 +20,56 @@ import java.util.Map;
  */
 public class RunApp {
     private static final Logger logger = LoggerFactory.getLogger(RunApp.class);
+    private static final ArtifactTransport artifactTransport = new ArtifactTransport();
 
     public void runApp(Map<String, String> map) {
-        String krb5Path = map.get("krb5Path");
-        String keytabPath = map.get("keytabPath");
-        String principal = map.get("principal");
         String hadoopConfDir = System.getenv().get("HADOOP_CONF_DIR");
-
-        if (StringUtils.isEmpty(krb5Path) || !FileUtils.checkFileIsExist(krb5Path)) {
-            logger.error("The krb5.conf path [{}] is not exist.", krb5Path);
-            System.exit(-1);
-        }
-        if (StringUtils.isEmpty(keytabPath) || !FileUtils.checkFileIsExist(keytabPath)) {
-            logger.error("The keytab path [{}] is not exist.", keytabPath);
-            System.exit(-1);
-        }
-        if (StringUtils.isEmpty(principal)) {
-            logger.error("The principal is be empty.");
-            System.exit(-1);
-        }
-        if (StringUtils.isEmpty(hadoopConfDir) || !FileUtils.checkDirectoryIsExist(hadoopConfDir)){
+        if (StringUtils.isEmpty(hadoopConfDir) || !FileUtils.checkDirectoryIsExist(hadoopConfDir)) {
             logger.error("The HADOOP_CONF_DIR is be empty.");
             System.exit(-1);
         }
         Configuration config = new Configuration();
-        KerberosUtils.tryKerberosLogin(config, keytabPath, krb5Path, principal);
+
+        KerberosUtils.loginKerberos(config, map);
+
         HadoopUtils instance = HadoopUtils.getInstance();
         instance.createFileSystem(config);
 
+        execute(instance, map);
+    }
 
-        Path[] paths = instance.listFiles("");
-        System.out.println(Arrays.toString(paths));
+    public void execute(HadoopUtils instance, Map<String, String> map) {
+        String artifactsJson = map.get("artifact-json");
+        if (StringUtils.isEmpty(artifactsJson)) {
+            logger.error("please enter artifactPath, targetPath and transportType");
+            System.exit(-1);
+        }
+        try {
+            JSONArray jsonArray = JSONArray.parseArray(artifactsJson);
+
+            jsonArray.parallelStream().forEach(item -> {
+                try {
+                    JSONObject artifactJsonObject = (JSONObject) item;
+                    String artifactPath = artifactJsonObject.getString("artifactPath");
+                    String targetPath = artifactJsonObject.getString("targetPath");
+                    String transportType = artifactJsonObject.getString("transportType");
+                    if (TransportType.UPLOAD.getType().equals(transportType.toLowerCase(Locale.ROOT))){
+                        artifactTransport.local2Hdfs(instance, artifactPath, targetPath);
+                    }else if (TransportType.DOWNLOAD.getType().equals(transportType.toLowerCase(Locale.ROOT))){
+                        artifactTransport.hdfs2local(instance, artifactPath, targetPath);
+                    }else {
+                        logger.warn("The transportType value [{}] input error or empty. please re-enter [{}] json", transportType, artifactPath);
+                    }
+                } catch (Exception e) {
+                    logger.error("transport artifact is failed. [{}]", item, e);
+                }
+            });
+        } catch (Exception e) {
+            logger.error("", e);
+        }finally {
+            instance.close();
+        }
+
     }
 
     public static void main(String[] args) {
