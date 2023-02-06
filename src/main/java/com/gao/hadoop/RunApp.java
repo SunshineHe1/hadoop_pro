@@ -20,7 +20,7 @@ import java.util.Map;
  */
 public class RunApp {
     private static final Logger logger = LoggerFactory.getLogger(RunApp.class);
-    private static final ArtifactTransport artifactTransport = new ArtifactTransport();
+    private static final ArtifactTransport ARTIFACT_TRANSPORT = new ArtifactTransport();
 
     public void runApp(Map<String, String> map) {
         String hadoopConfDir = System.getenv().get("HADOOP_CONF_DIR");
@@ -54,9 +54,9 @@ public class RunApp {
                     String targetPath = artifactJsonObject.getString("targetPath");
                     String transportType = artifactJsonObject.getString("transportType");
                     if (TransportType.UPLOAD.getType().equals(transportType.toLowerCase(Locale.ROOT))){
-                        artifactTransport.local2Hdfs(instance, artifactPath, targetPath);
+                        ARTIFACT_TRANSPORT.local2Hdfs(instance, artifactPath, targetPath);
                     }else if (TransportType.DOWNLOAD.getType().equals(transportType.toLowerCase(Locale.ROOT))){
-                        artifactTransport.hdfs2local(instance, artifactPath, targetPath);
+                        ARTIFACT_TRANSPORT.hdfs2local(instance, artifactPath, targetPath);
                     }else {
                         logger.warn("The transportType value [{}] input error or empty. please re-enter [{}] json", transportType, artifactPath);
                     }
