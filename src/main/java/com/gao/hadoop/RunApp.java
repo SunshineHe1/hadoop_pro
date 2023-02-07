@@ -9,9 +9,11 @@ import com.gao.hadoop.utils.HadoopUtils;
 import com.gao.hadoop.utils.KerberosUtils;
 import com.gao.hadoop.utils.StringUtils;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
 
@@ -53,12 +55,20 @@ public class RunApp {
                     String artifactPath = artifactJsonObject.getString("artifactPath");
                     String targetPath = artifactJsonObject.getString("targetPath");
                     String transportType = artifactJsonObject.getString("transportType");
+                    boolean aBoolean = false;
                     if (TransportType.UPLOAD.getType().equals(transportType.toLowerCase(Locale.ROOT))){
-                        ARTIFACT_TRANSPORT.local2Hdfs(instance, artifactPath, targetPath);
+                        Path[] paths = instance.listFiles("/test");
+                        System.out.println(Arrays.toString(paths));
+                        aBoolean = ARTIFACT_TRANSPORT.local2Hdfs(instance, artifactPath, targetPath);
                     }else if (TransportType.DOWNLOAD.getType().equals(transportType.toLowerCase(Locale.ROOT))){
-                        ARTIFACT_TRANSPORT.hdfs2local(instance, artifactPath, targetPath);
+                        aBoolean = ARTIFACT_TRANSPORT.hdfs2local(instance, artifactPath, targetPath);
                     }else {
                         logger.warn("The transportType value [{}] input error or empty. please re-enter [{}] json", transportType, artifactPath);
+                    }
+                    if (aBoolean){
+                        logger.info("transport artifact [{}] is success. target path list {}.", artifactJsonObject, Arrays.toString(instance.listFiles(targetPath)));
+                    }else {
+                        logger.warn("transport artifact [{}] is failed.", artifactJsonObject);
                     }
                 } catch (Exception e) {
                     logger.error("transport artifact is failed. [{}]", item, e);
@@ -76,5 +86,6 @@ public class RunApp {
         Map<String, String> map = StringUtils.argsToMap(args);
         RunApp runApp = new RunApp();
         runApp.runApp(map);
+
     }
 }

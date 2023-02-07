@@ -37,20 +37,19 @@ public class HadoopUtils {
             FileStatus[] fileStatuses = fs.listStatus(new Path(path));
             paths = FileUtil.stat2Paths(fileStatuses);
         } catch (IOException e) {
-            logger.error("read hdfs file path [{}] is failed.", path);
+            logger.error("read hdfs file path [{}] is failed.", path, e);
         }
         return paths;
     }
 
 
-    public boolean mkdirs(String path) {
+    public void mkdirs(String path) {
         logger.info("start create hadoop dir [{}].", path);
         try {
-            return fs.mkdirs(new Path(path), FsPermission.createImmutable((short) 777));
+            fs.mkdirs(new Path(path), FsPermission.createImmutable((short) 777));
         } catch (IOException e) {
             logger.error("create hadoop dir [{}] is failed.", path, e);
         }
-        return false;
     }
 
     public boolean copyFromLocalFile(String localPath, String targetPath) {

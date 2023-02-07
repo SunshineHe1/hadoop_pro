@@ -28,9 +28,6 @@ public class ArtifactTransport {
         try {
             File file = new File(artifactPath);
             if (file.isFile() || file.isDirectory()) {
-                if (!instance.exists(targetPath)) {
-                    instance.mkdirs(targetPath);
-                }
                 return instance.copyFromLocalFile(artifactPath, targetPath);
             } else {
                 logger.warn("local path [" + artifactPath + "] is not exist.");

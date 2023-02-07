@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<!--
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License. See accompanying LICENSE file.
+-->
+
+<!-- Put site-specific property overrides in this file. -->
+
+<configuration>
+    <property>
+        <name>dfs.namenode.kerberos.principal.pattern</name>
+        <value>*</value>
+    </property>
+    <property>
+        <name>dfs.replication</name>
+        <value>2</value>
+    </property>
+    <property>
+        <name>dfs.namenode.name.dir</name>
+        <value>file:/data/hadoop/name</value>
+    </property>
+    <property>
+        <name>dfs.datanode.data.dir</name>
+        <value>file:/data/hadoop/data</value>
+    </property>
+    <property>
+        <name>dfs.secondary.http.address</name>
+        <value>192.168.68.161:50090</value>
+    </property>
+
+<!-- kerberos start --> 
+<!-- namenode -->
+ 
+    <property>
+        <name>dfs.namenode.keytab.file</name>
+        <value>/opt/hadoop-2.8.5/etc/hadoop/hdfs.keytab</value>
+    </property>
+    <property>
+        <name>dfs.namenode.kerberos.principal</name>
+        <value>hdfs/_HOST@HADOOP.COM</value>
+    </property>
+    <property>
+        <name>dfs.namenode.kerberos.internal.spnego.principal</name>
+        <value>HTTP/_HOST@HADOOP.COM</value>
+    </property>
+    <property>
+        <name>dfs.webhdfs.enabled</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>dfs.web.authentication.kerberos.principal</name>
+        <value>HTTP/_HOST@HADOOP.COM</value>
+    </property>
+    <property>
+        <name>dfs.web.authentication.kerberos.keytab</name>
+        <value>/opt/hadoop-2.8.5/etc/hadoop/hdfs.keytab</value>
+    </property>
+ 
+<!-- datanode -->
+    <property>
+        <name>dfs.datanode.keytab.file</name>
+        <value>/opt/hadoop-2.8.5/etc/hadoop/hdfs.keytab</value>
+    </property>
+    <property>
+        <name>dfs.datanode.kerberos.principal</name>
+        <value>hdfs/_HOST@HADOOP.COM</value>
+    </property>
+
+<!-- https SASL -->
+    <property>
+        <name>dfs.datanode.address</name>
+        <value>0.0.0.0:1004</value>
+    </property>
+    <property>
+        <name>dfs.datanode.http.address</name>
+        <value>0.0.0.0:1006</value>
+    </property>
+<!-- 需要进行 https 配置 -->
+
+<!-- DataNode SASL配置,若不指定可能导致DataNode启动失败 -->
+<!--　　<property>
+　　　　<name>dfs.data.transfer.protection</name>
+　　　　<value>integrity</value>
+　　　　<description>逗号分隔的SASL保护值列表，用于在读取或写入块数据时与DataNode进行安全连接。可能的值为:"authentication"(仅表示身份验证，没有完整性或隐私), "integrity"(意味着启用了身份验证和完整性)和"privacy"(意味着所有身份验证，完整性和隐私都已启用)。如果dfs.encrypt.data.transfer设置为true，则它将取代dfs.data.transfer.protection的设置，并强制所有连接必须使用专门的加密SASL握手。对于与在特权端口上侦听的DataNode的连接，将忽略此属性。在这种情况下，假定特权端口的使用建立了足够的信任。</description> 
+　　</property>
+    <property>
+        <name>dfs.http.policy</name>
+        <value>HTTPS_ONLY</value>
+        <description>确定HDFS是否支持HTTPS(SSL)。默认值为"HTTP_ONLY"(仅在http上提供服务),"HTTPS_ONLY"(仅在https上提供服务,DataNode节点设置该值),"HTTP_AND_HTTPS"(同时提供服务在http和https上,NameNode和Secondary NameNode节点设置该值)。</description>
+    </property> -->
+
+<!-- set block data prem -->
+    <property>
+        <name>dfs.block.access.token.enable</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>dfs.datanode.data.dir.perm</name>
+        <value>755</value>
+    </property>
+    
+<!-- journalnode -->
+    <property>
+        <name>dfs.journalnode.keytab.file</name>
+        <value>/opt/hadoop-2.8.5/etc/hadoop/hdfs.keytab</value>
+    </property>
+    <property>
+        <name>dfs.journalnode.kerberos.principal</name>
+        <value>hdfs/_HOST@HADOOP.COM</value>
+    </property>
+    <property>
+        <name>dfs.journalnode.kerberos.internal.spnego.principal</name>
+        <value>HTTP/_HOST@HADOOP.COM</value>
+    </property>
+
+<!-- secondarynamenode -->
+    <property>
+        <name>dfs.secondary.namenode.keytab.file</name>
+        <value>/opt/hadoop-2.8.5/etc/hadoop/hdfs.keytab</value>
+    </property>
+    <property>
+        <name>dfs.secondary.namenode.kerberos.principal</name>
+        <value>hdfs/_HOST@HADOOP.COM</value>
+    </property>
+        <property>
+        <name>dfs.secondary.namenode.kerberos.internal.spnego.principal</name>
+        <value>HTTP/_HOST@HADOOP.COM</value>
+    </property>
+
+<!-- kerberos end-->
+</configuration>
