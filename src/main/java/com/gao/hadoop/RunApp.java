@@ -57,8 +57,6 @@ public class RunApp {
                     String transportType = artifactJsonObject.getString("transportType");
                     boolean aBoolean = false;
                     if (TransportType.UPLOAD.getType().equals(transportType.toLowerCase(Locale.ROOT))){
-                        Path[] paths = instance.listFiles("/test");
-                        System.out.println(Arrays.toString(paths));
                         aBoolean = ARTIFACT_TRANSPORT.local2Hdfs(instance, artifactPath, targetPath);
                     }else if (TransportType.DOWNLOAD.getType().equals(transportType.toLowerCase(Locale.ROOT))){
                         aBoolean = ARTIFACT_TRANSPORT.hdfs2local(instance, artifactPath, targetPath);
